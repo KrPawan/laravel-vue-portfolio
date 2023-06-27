@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Skill;
+use App\Models\Project;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProjectController extends Controller
 {
@@ -11,7 +17,11 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        // $projects = ProjectResource::collection(Project::all());
+        $projects = ProjectResource::collection(Project::with('skill')->get());
+
+
+        return Inertia::render('Projects/Index',compact('projects'));
     }
 
     /**
@@ -19,7 +29,9 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        $skills = Skill::all();
+        return Inertia::render('Projects/Create',compact('skills'));
+        
     }
 
     /**
@@ -27,7 +39,26 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'skill_id'=>['required'],
+            'name'=>['required','min:3'],
+            'image'=>['required','image']
+        ]);
+
+        if($request->hasFile('image')){
+            $image = $request->file('image')->store('projects');
+            Project::create([
+                'name'=>$request->name,
+                'image'=>$image,
+                'skill_id'=>$request->skill_id,
+                'project_url'=>$request->project_url
+            ]);
+    
+            return Redirect::route('projects.index')->with('message','Project Added Successfully');
+        }
+        return Redirect::back();
+
+        
     }
 
     /**
@@ -41,24 +72,48 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Project $project)
     {
-        //
+        $skills = Skill::all();
+        return Inertia::render('Projects/Edit',compact('project','skills'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Project $project)
     {
-        //
+        $image = $project->image;
+
+        $request->validate([
+            'skill_id'=>['required'],
+            'name'=>['required','min:3']
+        ]);
+
+        if($request->hasfile('image')){
+            Storage::delete($image);
+            $image = $request->file('image')->store('projects');
+        }
+        
+        $project->update([
+            'name'=>$request->name,
+            'skill_id'=>$request->skill_id,
+            'image'=>$image,
+            'project_url'=>$request->project_url,
+        ]);
+
+        return Redirect::route('projects.index')->with('message','Project Updated Successfully');
     }
+
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Project $project)
     {
-        //
+        Storage::delete($project->image);
+        $project->delete();
+        return Redirect::back()->with('message','Project Deleted Successfully');
     }
 }

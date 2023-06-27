@@ -1,5 +1,7 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
+import colors from '@tailwindcss/colors';
+
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -13,8 +15,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                primary: "Playfair Display",
+                body:"work Sans"
             },
+            container:{
+                padding:{
+                    DEFAULT:"1rem",
+                    lg:"3rem"
+                },
+            }, 
         },
     },
 

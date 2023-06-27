@@ -32,6 +32,12 @@ const showingNavigationDropdown = ref(false);
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
+                                <NavLink :href="route('skills.index')" :active="route().current('skills.index')">
+                                    Skills
+                                </NavLink>
+                                <NavLink :href="route('projects.index')" :active="route().current('projects.index')">
+                                    Projects
+                                </NavLink>
                             </div>
                         </div>
 
@@ -136,6 +142,12 @@ const showingNavigationDropdown = ref(false);
                 </div>
             </nav>
 
+            <div class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 "  
+                v-if="$page.props.flash.message"
+                role="alert"
+            >
+                <div class="max-w-7xl mx-auto" >{{ $page.props.flash.message }}</div>
+            </div>
             <!-- Page Heading -->
             <header class="bg-white shadow" v-if="$slots.header">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
